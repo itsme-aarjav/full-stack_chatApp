@@ -275,6 +275,9 @@ All application components are deployed in the isolated `chat-app` namespace usi
 ![Kubernetes Cluster Overview](docs/screenshots/08-kubernetes-overview.png)
 *Figure 5: Active workloads, services, ingress, autoscalers, and persistent storage in the chat-app namespace.*
 
+![Kubernetes Dashboard](docs/screenshots/11-kubernetes-dashboard.png)
+*Figure 6: Kubernetes Dashboard showing all three running pods (backend, frontend, and mongodb) with live CPU and memory readings.*
+
 ### Workload Summary
 
 | Workload Name | Kind | Replicas | Port | Probes |
@@ -350,6 +353,9 @@ spec:
           averageUtilization: 70
 ```
 
+![HPA Live Metrics](docs/screenshots/12-hpa-describe.png)
+*Figure 7: Live HPA describe output showing backend at 1% and frontend at 2% CPU utilization against the 70% target, with all scaling conditions reporting healthy.*
+
 ---
 
 ## Helm Packaging and Releases
@@ -395,6 +401,9 @@ helm upgrade chatapp ./helm/chatapp \
   --set frontend.image.tag="$IMAGE_TAG"
 ```
 
+![Helm Status Output](docs/screenshots/10-helm-status.png)
+*Figure 8: `helm status chatapp` showing Revision 24, all three pods running, both HPA targets active, ingress live at 192.168.49.2, and services up across the chat-app namespace.*
+
 ---
 
 ## Failure Recovery and Rollback Testing
@@ -413,6 +422,9 @@ Running `helm history chatapp -n chat-app` tracked the deployment states:
 2. Revision 23: Rollback command issued via `helm rollback chatapp 21 -n chat-app`.
 3. Revision 24: Restored to healthy `deployed` state.
 
+![Helm Rollback History](docs/screenshots/13-helm-history.png)
+*Figure 9: `helm list` and `helm history` output confirming the failed revision 22, automated rollback to revision 23, and clean re-deployment at revision 24.*
+
 ### 3. Recovery Verification
 
 Running `kubectl rollout status` confirmed immediate restoration to the last working release without downtime.
@@ -428,6 +440,9 @@ MongoDB requires persistent data storage that survives pod restarts and redeploy
 1. Workload Type: Deployed as a `StatefulSet` (`chatapp-mongodb`) to guarantee stable network identity (`chatapp-mongodb-0`) and dedicated volume bindings.
 2. Volume Claim Template: Requests a `5Gi` volume with `ReadWriteOnce` access mode bound to the default storage class.
 3. Persistent Volume Claim: `mongodb-data-chatapp-mongodb-0` is bound to volume `pvc-d93474c3-018f-4c59-8cd4-ea03146505e8`.
+
+![MongoDB PVC and StatefulSet Verification](docs/screenshots/09-mongodb-pvc-statefulset.png)
+*Figure 10: `kubectl get pvc` and `kubectl get statefulset,pods` confirming the 5Gi volume is bound and the MongoDB pod has been running without restarts for over five hours.*
 
 ### Persistence Validation Test
 
