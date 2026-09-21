@@ -1,0 +1,94 @@
+backend:
+  replicaCount: 1
+
+  image:
+    repository: aarjavjainn/chatapp-backend
+    tag: latest
+    pullPolicy: IfNotPresent
+
+  service:
+    type: ClusterIP
+    port: 5001
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+  env:
+    NODE_ENV: production
+    PORT: "5001"
+
+
+frontend:
+  replicaCount: 1
+
+  image:
+    repository: aarjavjainn/chatapp-frontend
+    tag: latest
+    pullPolicy: IfNotPresent
+
+  service:
+    type: ClusterIP
+    port: 80
+
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
+
+
+mongodb:
+  image:
+    repository: mongo
+    tag: "7.0.43-jammy"
+    pullPolicy: IfNotPresent
+
+  service:
+    port: 27017
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+  persistence:
+    enabled: true
+    size: 5Gi
+    accessModes:
+      - ReadWriteOnce
+
+
+ingress:
+  enabled: true
+  className: nginx
+  annotations: {}
+  host: chatapp.local
+  paths:
+    - path: /
+      pathType: Prefix
+      service: frontend
+      port: 80
+
+
+autoscaling:
+  backend:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 3
+    targetCPUUtilizationPercentage: 70
+
+  frontend:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 3
+    targetCPUUtilizationPercentage: 70

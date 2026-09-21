@@ -1,0 +1,42 @@
+services:
+  mongodb:
+    image: mongo:7.0.43-jammy
+    volumes:
+      - mongo-data:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGODB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_ROOT_PASSWORD}
+    ports:
+      - "27017:27017"
+    networks:
+      - fullstack-chatapp
+
+  backend:
+    image: aarjavjainn/chatapp-backend:latest
+    container_name: full-stack_backend
+    environment:
+      NODE_ENV: production
+      MONGODB_URI: mongodb://${MONGODB_ROOT_USERNAME}:${MONGODB_ROOT_PASSWORD}@mongodb:27017/chatApp?authSource=admin
+      JWT_SECRET: ${JWT_SECRET}
+      PORT: 5001
+    depends_on:
+      - mongodb
+    networks:
+      - fullstack-chatapp
+
+  frontend:
+    image: aarjavjainn/chatapp-frontend:latest
+    container_name: full-stack_frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - fullstack-chatapp
+
+networks:
+  fullstack-chatapp:
+    driver: bridge
+
+volumes:
+  mongo-data:
