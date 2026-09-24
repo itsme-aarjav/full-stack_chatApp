@@ -422,9 +422,6 @@ Running `helm history chatapp -n chat-app` tracked the deployment states:
 2. Revision 23: Rollback command issued via `helm rollback chatapp 21 -n chat-app`.
 3. Revision 24: Restored to healthy `deployed` state.
 
-![Helm Rollback History](docs/screenshots/13-helm-history.png)
-*Figure 9: `helm list` and `helm history` output confirming the failed revision 22, automated rollback to revision 23, and clean re-deployment at revision 24.*
-
 ### 3. Recovery Verification
 
 Running `kubectl rollout status` confirmed immediate restoration to the last working release without downtime.
